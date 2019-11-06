@@ -59,7 +59,7 @@ disconnect(#state{connection = Connection} = State, _Meta) ->
 connect(State, Meta, Host, Port) when is_list(Host) ->
     connect(State, Meta, list_to_binary(Host), Port);
 connect(State, _Meta, Host, Port) ->
-    {ok, ConnRef} = hackney:connect(hackney_tcp, Host, Port, []),
+    {ok, ConnRef} = hackney:connect(hackney_ssl, Host, Port, []),
     {nil, State#state{connection = ConnRef}}.
 
 -spec set_options(state(), meta(), http_options()) -> {nil, state()}.
