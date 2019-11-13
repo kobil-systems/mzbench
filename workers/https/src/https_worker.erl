@@ -104,6 +104,5 @@ record_response(Prefix, Response) ->
         E ->
             lager:error("hackney:request failed: ~p", [E]),
             mzb_metrics:notify({Prefix ++ ".other_fail", counter}, 1)
-    end
-    Body.
+    end.
 
