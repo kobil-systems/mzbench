@@ -98,7 +98,7 @@ record_response(Prefix, Response) ->
             Connection;
         {ok, _, _, Connection} ->
             {ok, Body} = hackney:body(Connection),
-            lager:error("hackney:response fail: ~p", Body),
+            lager:error("hackney:response fail: ~p", [Body]),
             mzb_metrics:notify({Prefix ++ ".http_fail", counter}, 1),
             Connection;
         E ->
