@@ -80,7 +80,7 @@ post(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
 post(#state{connection = Connection, prefix = Prefix, options = Options} = State, _Meta, Endpoint, Payload) ->
     Response = ?TIMED(Prefix ++ ".latency", hackney:send_request(Connection,
         {post, Endpoint, Options, Payload})),
-    {nil, State#state{connection = record_response(Prefix, Response)}}.
+    { hackney:body(Connection), State#state{connection = record_response(Prefix, Response)}}.
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
 put(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
@@ -93,16 +93,17 @@ put(#state{connection = Connection, prefix = Prefix, options = Options} = State,
 record_response(Prefix, Response) ->
     case Response of
         {ok, 200, _, Connection} ->
-            hackney:body(Connection),
+            %{ok, Body} = hackney:body(Connection),
             mzb_metrics:notify({Prefix ++ ".http_ok", counter}, 1),
             Connection;
         {ok, _, _, Connection} ->
-            {ok, Body} = hackney:body(Connection),
-            lager:error("hackney:response fail: ~p", [Body]),
+            %{ok, Body} = hackney:body(Connection),
+            %lager:error("hackney:response fail: ~p", [Body]),
             mzb_metrics:notify({Prefix ++ ".http_fail", counter}, 1),
             Connection;
         E ->
             lager:error("hackney:request failed: ~p", [E]),
             mzb_metrics:notify({Prefix ++ ".other_fail", counter}, 1)
-    end.
+    end
+    Body.
 
