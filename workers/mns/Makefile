@@ -1,6 +1,6 @@
 REBAR := $(abspath $(shell which ../../bin/rebar3 || which rebar3))
 
-SOURCES := src/mns_worker.erl src/https_worker.app.src
+SOURCES := src/mns_worker.erl src/mns_worker.app.src
 
 .PHONY: compile
 compile: .make/compilation-up-to-date
@@ -9,7 +9,7 @@ compile: .make/compilation-up-to-date
 generate_tgz: pkgroot
 	mkdir -p pkgroot
 	rsync -aW pkgroot/ pkgroot
-	cd pkgroot && tar czf ../https_worker.tgz ./${PKG_NAME} && cd ..
+	cd pkgroot && tar czf ../mns_worker.tgz ./${PKG_NAME} && cd ..
 	rm -rf pkgroot
 
 .make/compilation-up-to-date: $(SOURCES) rebar.config
