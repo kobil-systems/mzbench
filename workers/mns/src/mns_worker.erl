@@ -84,7 +84,7 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
         {post, Endpoint, Options, Payload})),
     { hackney:body(GK_connection), State#state{gk_connection = record_response(Prefix, Response)}}.
 
--spec mns_register(state(), meta(), string(), integer()) -> {nil,stats()}.
+-spec mns_register(state(), meta(), string(), integer()) -> {nil,state()}.
 mns_register(State, Meta, Endpoint, MacPrefix) ->
     StringMacPrefix = integer_to_list(MacPrefix).
 
