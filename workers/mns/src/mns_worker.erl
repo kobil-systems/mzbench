@@ -3,7 +3,7 @@
 -export([initial_state/0, metrics/0]).
 
 -export([gk_connect/4, set_options/3, gk_disconnect/2,
-    get/3, gk_post/4, put/4, set_prefix/3]).
+    get/3, gk_post/4, put/4, set_prefix/3, mns_register/4]).
 
 -type meta() :: [{Key :: atom(), Value :: any()}].
 -type http_options() :: list().
@@ -12,6 +12,8 @@
     { gk_connection = undefined
     , prefix = "default"
     , http_options = [] :: http_options()
+    , network_mac
+    , network_id
     }).
 
 -type state() :: #state{}.
@@ -39,9 +41,9 @@ metrics(Prefix) ->
             {graph, #{title => "HTTP Response",
                       units => "N",
                       metrics => [{Prefix ++ ".http_ok", counter}, {Prefix ++ ".http_fail", counter}, {Prefix ++ ".other_fail", counter}]}},
-            {graph, #{title => "Latency",
+            {graph, #{title => "HTTP Latency",
                       units => "microseconds",
-                      metrics => [{Prefix ++ ".latency", histogram}]}}
+                      metrics => [{Prefix ++ ".http_latency", histogram}]}}
         ]}
     ].
 
@@ -70,7 +72,7 @@ set_options(State, _Meta, NewOptions) ->
 get(State, Meta, Endpoint) when is_list(Endpoint) ->
     get(State, Meta, list_to_binary(Endpoint));
 get(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Options} = State, _Meta, Endpoint) ->
-    Response = ?TIMED(Prefix ++ ".latency", hackney:send_request(GK_connection,
+    Response = ?TIMED(Prefix ++ ".http_latency", hackney:send_request(GK_connection,
         {get, Endpoint, Options, <<>>})),
     {nil, State#state{gk_connection = record_response(Prefix, Response)}}.
 
@@ -78,15 +80,19 @@ get(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Option
 gk_post(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
     gk_post(State, Meta, list_to_binary(Endpoint), Payload);
 gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Options} = State, _Meta, Endpoint, Payload) ->
-    Response = ?TIMED(Prefix ++ ".latency", hackney:send_request(GK_connection,
+    Response = ?TIMED(Prefix ++ ".http_latency", hackney:send_request(GK_connection,
         {post, Endpoint, Options, Payload})),
     { hackney:body(GK_connection), State#state{gk_connection = record_response(Prefix, Response)}}.
+
+-spec mns_register(state(), meta(), string(), integer()) -> {nil,stats()}.
+mns_register(State, Meta, Endpoint, MacPrefix) ->
+    StringMacPrefix = integer_to_list(MacPrefix).
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
 put(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
     put(State, Meta, list_to_binary(Endpoint), Payload);
 put(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Options} = State, _Meta, Endpoint, Payload) ->
-    Response = ?TIMED(Prefix ++ ".latency", hackney:send_request(GK_connection,
+    Response = ?TIMED(Prefix ++ ".http_latency", hackney:send_request(GK_connection,
         {put, Endpoint, Options, Payload})),
     {nil, State#state{gk_connection = record_response(Prefix, Response)}}.
 
