@@ -1,11 +1,12 @@
 %% -*- mode: erlang -*-
 {application, mns_worker,
  [
-  {description, "Mz-bench worker example"},
-  {vsn, "1.0.0"},
+  {description, "MZBench http worker"},
+  {vsn, git},
   {applications, [
                   kernel,
-                  stdlib
+                  stdlib,
+                  hackney
                  ]},
   {env, []}
  ]}.
