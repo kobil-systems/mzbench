@@ -2,7 +2,7 @@
 
 -export([initial_state/0, metrics/0]).
 
--export([connect/4, set_options/3, disconnect/2,
+-export([gk_connect/4, set_options/3, gk_disconnect/2,
     get/3, gk_post/4, put/4, set_prefix/3]).
 
 -type meta() :: [{Key :: atom(), Value :: any()}].
@@ -50,15 +50,15 @@ set_prefix(State, _Meta, NewPrefix) ->
     mzb_metrics:declare_metrics(metrics(NewPrefix)),
     {nil, State#state{prefix = NewPrefix}}.
 
--spec disconnect(state(), meta()) -> {nil, state()}.
-disconnect(#state{connection = Connection} = State, _Meta) ->
+-spec gk_disconnect(state(), meta()) -> {nil, state()}.
+gk_disconnect(#state{connection = Connection} = State, _Meta) ->
     hackney:close(Connection),
     {nil, State}.
 
--spec connect(state(), meta(), string() | binary(), integer()) -> {nil, state()}.
-connect(State, Meta, Host, Port) when is_list(Host) ->
-    connect(State, Meta, list_to_binary(Host), Port);
-connect(State, _Meta, Host, Port) ->
+-spec gk_connect(state(), meta(), string() | binary(), integer()) -> {nil, state()}.
+gk_connect(State, Meta, Host, Port) when is_list(Host) ->
+    gk_connect(State, Meta, list_to_binary(Host), Port);
+gk_connect(State, _Meta, Host, Port) ->
     {ok, ConnRef} = hackney:connect(hackney_ssl, Host, Port, []),
     {nil, State#state{connection = ConnRef}}.
 
