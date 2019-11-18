@@ -51,8 +51,8 @@ set_prefix(State, _Meta, NewPrefix) ->
     {nil, State#state{prefix = NewPrefix}}.
 
 -spec gk_disconnect(state(), meta()) -> {nil, state()}.
-gk_disconnect(#state{connection = Connection} = State, _Meta) ->
-    hackney:close(Connection),
+gk_disconnect(#state{connection = GK_connection} = State, _Meta) ->
+    hackney:close(GK_connection),
     {nil, State}.
 
 -spec gk_connect(state(), meta(), string() | binary(), integer()) -> {nil, state()}.
@@ -69,38 +69,38 @@ set_options(State, _Meta, NewOptions) ->
 -spec get(state(), meta(), string() | binary()) -> {nil, state()}.
 get(State, Meta, Endpoint) when is_list(Endpoint) ->
     get(State, Meta, list_to_binary(Endpoint));
-get(#state{connection = Connection, prefix = Prefix, options = Options} = State, _Meta, Endpoint) ->
-    Response = ?TIMED(Prefix ++ ".latency", hackney:send_request(Connection,
+get(#state{connection = GK_connection, prefix = Prefix, options = Options} = State, _Meta, Endpoint) ->
+    Response = ?TIMED(Prefix ++ ".latency", hackney:send_request(GK_connection,
         {get, Endpoint, Options, <<>>})),
     {nil, State#state{connection = record_response(Prefix, Response)}}.
 
 -spec gk_post(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
 gk_post(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
     gk_post(State, Meta, list_to_binary(Endpoint), Payload);
-gk_post(#state{connection = Connection, prefix = Prefix, options = Options} = State, _Meta, Endpoint, Payload) ->
-    Response = ?TIMED(Prefix ++ ".latency", hackney:send_request(Connection,
+gk_post(#state{connection = GK_connection, prefix = Prefix, options = Options} = State, _Meta, Endpoint, Payload) ->
+    Response = ?TIMED(Prefix ++ ".latency", hackney:send_request(GK_connection,
         {post, Endpoint, Options, Payload})),
-    { hackney:body(Connection), State#state{connection = record_response(Prefix, Response)}}.
+    { hackney:body(GK_connection), State#state{connection = record_response(Prefix, Response)}}.
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
 put(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
     put(State, Meta, list_to_binary(Endpoint), Payload);
-put(#state{connection = Connection, prefix = Prefix, options = Options} = State, _Meta, Endpoint, Payload) ->
-    Response = ?TIMED(Prefix ++ ".latency", hackney:send_request(Connection,
+put(#state{connection = GK_connection, prefix = Prefix, options = Options} = State, _Meta, Endpoint, Payload) ->
+    Response = ?TIMED(Prefix ++ ".latency", hackney:send_request(GK_connection,
         {put, Endpoint, Options, Payload})),
     {nil, State#state{connection = record_response(Prefix, Response)}}.
 
 record_response(Prefix, Response) ->
     case Response of
-        {ok, 200, _, Connection} ->
-            %{ok, Body} = hackney:body(Connection),
+        {ok, 200, _, GK_connection} ->
+            %{ok, Body} = hackney:body(GK_connection),
             mzb_metrics:notify({Prefix ++ ".http_ok", counter}, 1),
-            Connection;
-        {ok, _, _, Connection} ->
-            %{ok, Body} = hackney:body(Connection),
+            GK_connection;
+        {ok, _, _, GK_connection} ->
+            %{ok, Body} = hackney:body(GK_connection),
             %lager:error("hackney:response fail: ~p", [Body]),
             mzb_metrics:notify({Prefix ++ ".http_fail", counter}, 1),
-            Connection;
+            GK_connection;
         E ->
             lager:error("hackney:request failed: ~p", [E]),
             mzb_metrics:notify({Prefix ++ ".other_fail", counter}, 1)
