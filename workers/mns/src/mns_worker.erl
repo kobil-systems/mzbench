@@ -85,7 +85,7 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
     { hackney:body(GK_connection), State#state{gk_connection = record_response(Prefix, Response)}}.
 
 -spec mns_register(state(), meta(), string(), integer()) -> {nil,state()}.
-mns_register(State, Meta, Endpoint, MacPrefix) ->
+mns_register(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Options} = State, Meta, Endpoint, MacPrefix) ->
     GKHeaders = [{<<"Content-Type">>, <<"application/json">>}],
     StringMacPrefix = integer_to_list(MacPrefix),
     FinalMacPrefix = re:replace(StringMacPrefix,"[0-9]{2}", "&:", [global, {return, list}]),
