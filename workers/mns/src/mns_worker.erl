@@ -88,6 +88,7 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
 mns_register(State, Meta, Endpoint, MacPrefix) ->
     StringMacPrefix = integer_to_list(MacPrefix),
     FinalMacPrefix = re:replace(StringMacPrefix,"[0-9]{2}", "&:", [global, {return, list}]),
+    JsonOutput = io_lib:format("The  ~s is very ~s today", [FinalMacPrefix]),
     lager:error("MNS: ~p", [FinalMacPrefix]).
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
