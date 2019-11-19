@@ -87,8 +87,8 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
 -spec mns_register(state(), meta(), string(), integer()) -> {nil,state()}.
 mns_register(State, Meta, Endpoint, MacPrefix) ->
     StringMacPrefix = integer_to_list(MacPrefix),
-    StringMacPrefix = re:replace(StringMacPrefix,"[0-9]{2}", "&:", [global, {return, list}]),
-    lager:error("MNS: ~p", [StringMacPrefix]).
+    FinalMacPrefix = re:replace(StringMacPrefix,"[0-9]{2}", "&:", [global, {return, list}]),
+    lager:error("MNS: ~p", [FinalMacPrefix]).
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
 put(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
