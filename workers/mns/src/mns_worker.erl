@@ -100,8 +100,8 @@ mns_register(#state{gk_connection = GK_connection, prefix = Prefix, http_options
     {match,MQServer}=re:run(ResponseBody, "mqServer\":\"(mqtt\\.[^\"]*)", [{capture, all_but_first, list}]),
     {match,MQPassword}=re:run(ResponseBody, "mqToken\":\"([^\"]*)", [{capture, all_but_first, list}]),
     MQUsername = "device",
-    
-    lager:error("MNS: ~s", [MQPassword]).
+
+    lager:error("MNS: NetworkId: ~s GuardianID: ~s MQServer: ~s MQQPassword: ~s ----------all Else ~s", [NetworkId, GuardianId, MQServer, MQPassword, ResponseBody]).
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
 put(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
