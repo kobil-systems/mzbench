@@ -99,9 +99,9 @@ mns_register(#gkstate{gk_connection = GK_connection, prefix = Prefix, http_optio
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQPassword}=re:run(ResponseBody, "guardian_mqtt.*mqToken\":\"([^\"]*)", [{capture, all_but_first, list}]),
-    MQUsername = "device",
+    MQUsername = "device".
 
-    lager:error("MNS: NetworkId: ~s GuardianID: ~s MQServer: ~s MQQPassword: ~s ----------all Else ~s", [NetworkId, GuardianId, MQServer, MQPassword, ResponseBody]).
+    %lager:error("MNS: NetworkId: ~s GuardianID: ~s MQServer: ~s MQQPassword: ~s ----------all Else ~s", [NetworkId, GuardianId, MQServer, MQPassword, ResponseBody]).
 
 -spec put(gkstate(), meta(), string() | binary(), iodata()) -> {nil, gkstate()}.
 put(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
