@@ -96,7 +96,7 @@ mns_register(#state{gk_connection = GK_connection, prefix = Prefix, http_options
     Path = <<"/gatekeeper">>,
     {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
-    {match,MQServer}=re:run(ResponseBody, "mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
+    {match,MQServer}=re:run(ResponseBody, "mqServer\":\"(mqtt\\.[^\"]*)", [{capture, all_but_first, list}]),
     lager:error("MNS: ~s", [MQServer]).
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
