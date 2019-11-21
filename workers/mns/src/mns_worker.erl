@@ -94,9 +94,9 @@ mns_register(#state{gk_connection = GK_connection, prefix = Prefix, http_options
     set_options(State, Meta, GKHeaders),
     %Payload = <<"potato">>,
     Path = <<"/gatekeeper">>,
-    {Response, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
+    {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
     %re:run(Response, ""),
-    lager:error("MNS: ~s", [Response]).
+    lager:error("MNS: ~s", [ResponseBody]).
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
 put(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
