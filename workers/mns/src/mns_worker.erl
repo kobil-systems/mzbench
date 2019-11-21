@@ -90,13 +90,13 @@ mns_register(#state{gk_connection = GK_connection, prefix = Prefix, http_options
     StringMacPrefix = integer_to_list(MacPrefix),
     FinalMacPrefix = re:replace(StringMacPrefix,"[0-9]{2}", "&:", [global, {return, list}]),
     JsonOutput = io_lib:format("{\"radar_status\": {\"deviceId\": \"test-~s\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"ETHERNET\", \"mac\": \"~s01\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s10\", \"peer_type\": \"7\"}, {\"mac\": \"~s20\", \"peer_type\": \"7\"}, {\"mac\": \"~s30\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s02\", \"ap_bssid_5ghz\": \"~s:03\", \"mesh_bssid\": \"~s:00\", \"gateway_bssid\": \"ff:00:00:00:00:00\", \"root_mode\": 2}, \"factory_reset\": \"False\", \"master_failed\": \"False\", \"location_id\": \"~s:00\"}", [StringMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix]),
-    gk_connect( #state{gk_connection = GK_connection} = State, Meta,"mns.load.qa.wifimotion.ca", 443),
+    %gk_connect( #state{gk_connection = GK_connection} = State, Meta,"mns.load.qa.wifimotion.ca", 443),
     set_options(State, Meta, GKHeaders),
     %Payload = <<"potato">>,
     Path = <<"/gatekeeper">>,
     {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
-    %re:run(Response, ""),
-    lager:error("MNS: ~s", [ResponseBody]).
+    {Match, Captured}=re:run(ResponseBody, "network_id\":[0-9]*"),
+    lager:error("MNS: ~s", [Captured]).
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
 put(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
