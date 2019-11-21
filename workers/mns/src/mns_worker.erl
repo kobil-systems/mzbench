@@ -95,11 +95,12 @@ mns_register(#gkstate{gk_connection = GK_connection, prefix = Prefix, http_optio
     %Payload = <<"potato">>,
     Path = <<"/gatekeeper">>,
     {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
+    MQUsername = <<"device">>,
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
-    {match,MQPassword}=re:run(ResponseBody, "guardian_mqtt.*mqToken\":\"([^\"]*)", [{capture, all_but_first, list}]),
-    MQUsername = <<"device">>.
+    {match,MQPassword}=re:run(ResponseBody, "guardian_mqtt.*mqToken\":\"([^\"]*)", [{capture, all_but_first, list}]).
+    
 
     %lager:error("MNS: NetworkId: ~s GuardianID: ~s MQServer: ~s MQQPassword: ~s ----------all Else ~s", [NetworkId, GuardianId, MQServer, MQPassword, ResponseBody]).
 
