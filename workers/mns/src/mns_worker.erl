@@ -95,7 +95,7 @@ mns_register(#state{gk_connection = GK_connection, prefix = Prefix, http_options
     %Payload = <<"potato">>,
     Path = <<"/gatekeeper">>,
     {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
-    Captured=re:run(ResponseBody, "network_id\":[0-9]*"),
+    Captured=re:run(ResponseBody, "network_id\":([0-9]*)"),
     lager:error("MNS: ~s", [Captured]).
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
