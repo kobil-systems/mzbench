@@ -122,7 +122,7 @@ metrics(Prefix) ->
             {graph, #{title => "HTTP Latency",
                       units => "microseconds",
                       metrics => [{Prefix ++ ".http_latency", histogram}]}}
-        ]}
+        ]},
         {group, "MQTT Pub to Sub Latency", [
             {graph, #{title => "Pub to Sub Latency (QoS 0)", metrics => [{"mqtt.message.pub_to_sub.latency", histogram}]}},
             {graph, #{title => "Pub to Sub Latency (QoS 1)", metrics => [{"mqtt.message.pub_to_sub.latency.qos1", histogram}]}},
