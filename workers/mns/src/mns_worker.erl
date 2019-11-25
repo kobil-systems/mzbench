@@ -27,7 +27,8 @@
     load_client_cert/3,
     load_client_key/3,
     load_cas/3,
-    get_cert_bin/1]).
+    get_cert_bin/1,
+    mq_cluster_connect/2]).
 
 % gen_mqtt stats callback
 -export([stats/2]).
@@ -271,7 +272,7 @@ record_response(Prefix, Response) ->
             mzb_metrics:notify({Prefix ++ ".other_fail", counter}, 1)
     end.
 
--spec mqtt_push(state(), meta() )
+-spec mq_cluster_connect(state(), meta() )
 mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, guardian_id = GuardianId, mq_server = MQServer, mq_password = MQPassword } = State, Meta)->
     connect(State, Meta, [t(host, MQServer),
             t(port,1883),
