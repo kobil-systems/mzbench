@@ -9,4 +9,5 @@
                   hackney
                  ]},
   {env, []}
+  %%{mod, {mqtt_worker, []}}
  ]}.

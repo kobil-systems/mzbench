@@ -349,6 +349,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 connect(State, _Meta, ConnectOpts) ->
     ClientId = proplists:get_value(client, ConnectOpts),
+    lager:warning("The client ID ~p and state: ~p <<", [ClientId, State])
     Args = #mqtt{action={idle}},
     {ok, SessionPid} = gen_emqtt:start_link(?MODULE, Args, [{info_fun, {fun stats/2, maps:new()}}|ConnectOpts]),
     {nil, State#state{mqtt_fsm=SessionPid, client=ClientId}}.
