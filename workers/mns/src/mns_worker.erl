@@ -272,7 +272,7 @@ record_response(Prefix, Response) ->
             mzb_metrics:notify({Prefix ++ ".other_fail", counter}, 1)
     end.
 
--spec mq_cluster_connect(state(), meta() )
+-spec mq_cluster_connect(state(), meta() ) -> {nil, state()}.
 mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, guardian_id = GuardianId, mq_server = MQServer, mq_password = MQPassword } = State, Meta)->
     connect(State, Meta, [t(host, MQServer),
             t(port,1883),
