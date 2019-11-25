@@ -271,7 +271,18 @@ record_response(Prefix, Response) ->
             mzb_metrics:notify({Prefix ++ ".other_fail", counter}, 1)
     end.
 
-
+-spec mqtt_push(state(), meta() )
+mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, guardian_id = GuardianId, mq_server = MQServer, mq_password = MQPassword } = State, Meta)->
+    connect(State, Meta, [t(host, MQServer),
+            t(port,1883),
+            t(username, "device"),
+            t(password, MQPassword),
+            t(client,fixed_client_id("pool1", worker_id())),
+            t(clean_session,true),
+            t(keepalive_interval,60),
+            t(proto_version,4), t(reconnect_timeout,4)
+            ]),
+    {nil, State}.
 
 
 
