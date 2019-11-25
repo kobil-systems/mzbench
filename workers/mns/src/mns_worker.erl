@@ -274,15 +274,16 @@ record_response(Prefix, Response) ->
 
 -spec mq_cluster_connect(state(), meta() ) -> {nil, state()}.
 mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, guardian_id = GuardianId, mq_server = MQServer, mq_password = MQPassword } = State, Meta)->
-    connect(State, Meta, [t(host, MQServer),
-            t(port,1883),
-            t(username, "device"),
-            t(password, MQPassword),
-            t(client,fixed_client_id("pool1", worker_id())),
-            t(clean_session,true),
-            t(keepalive_interval,60),
-            t(proto_version,4), t(reconnect_timeout,4)
-            ]),
+    connect(State, Meta, {"host" = MQServer,
+            "port" = 1883,
+            "username" =  "device",
+            "password" = MQPassword,
+            "client" = fixed_client_id("pool1", worker_id())),
+            "clean_session","true",
+            "keepalive_interval" = 60,
+            "proto_version" = 4,
+            "reconnect_timeout"=4
+            }),
     {nil, State}.
 
 
@@ -366,7 +367,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 connect(State, _Meta, ConnectOpts) ->
     ClientId = proplists:get_value(client, ConnectOpts),
-    lager:warning("The client ID ~p and state: ~p <<", [ClientId, State]),
+    lager:warning("The Connect Options ~p <<", [ConnectOpts]),
     Args = #mqtt{action={idle}},
     {ok, SessionPid} = gen_emqtt:start_link(?MODULE, Args, [{info_fun, {fun stats/2, maps:new()}}|ConnectOpts]),
     {nil, State#state{mqtt_fsm=SessionPid, client=ClientId}}.
