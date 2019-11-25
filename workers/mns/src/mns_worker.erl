@@ -90,7 +90,7 @@
     , network_id
     }).
 
-%-type state() :: #state{}.
+-type state() :: #state{}.
 
 -define(TIMED(Name, Expr),
     (fun () ->
@@ -104,7 +104,6 @@
 -spec initial_state() -> state().
 initial_state() ->
     application:set_env(hackney, use_default_pool, false),
-    #state{},
     #state{}.
 
 init(State) ->  % init gen_mqtt
