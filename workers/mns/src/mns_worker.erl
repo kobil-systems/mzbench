@@ -276,15 +276,15 @@ record_response(Prefix, Response) ->
 mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, guardian_id = GuardianId, mq_server = MQServer, mq_password = MQPassword } = State, Meta)->
     {WorkerId, State} = worker_id(State, Meta),
     {ClientId, State} = fixed_client_id(State, Meta, "pool1", WorkerId),
-    connect(State, Meta, [{"host",  MQServer},
-            {"port" , "1883"},
-            {"username" ,  "device"},
-            {"password" , MQPassword},
-            {"client" , ClientId},
-            {"clean_session","true"},
-            {"keepalive_interval" , "60"},
-            {"proto_version" , "4"},
-            {"reconnect_timeout","4"}
+    connect(State, Meta, [{host,  MQServer},
+            {port , 1883},
+            {username ,  "device"},
+            {password , MQPassword},
+            {client , ClientId},
+            {clean_session,true},
+            {keepalive_interval , 60},
+            {proto_version , 4},
+            {reconnect_timeout,4}
             ]),
     {nil, State}.
 
