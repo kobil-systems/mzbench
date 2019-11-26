@@ -276,7 +276,7 @@ record_response(Prefix, Response) ->
 mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, guardian_id = GuardianId, mq_server = MQServer, mq_password = MQPassword } = State, Meta)->
     {WorkerId, State} = worker_id(State, Meta),
     {ClientId, State} = fixed_client_id(State, Meta, "pool1", WorkerId),
-    connect(State, Meta, [{host,  MQServer},
+    {nil, State} = connect(State, Meta, [{host,  MQServer},
             {port , 1883},
             {username ,  "device"},
             {password , MQPassword},
@@ -286,6 +286,7 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
             {proto_version , 4},
             {reconnect_timeout,4}
             ]),
+
     {nil, State}.
 
 
@@ -370,6 +371,7 @@ code_change(_OldVsn, State, _Extra) ->
 connect(State, _Meta, ConnectOpts) ->
     ClientId = proplists:get_value(client, ConnectOpts),
     lager:warning("The Connect Options ~p <<", [ConnectOpts]),
+    lager:warning("The State Options ~p <<", [State]),
     Args = #mqtt{action={idle}},
     {ok, SessionPid} = gen_emqtt:start_link(?MODULE, Args, [{info_fun, {fun stats/2, maps:new()}}|ConnectOpts]),
     {nil, State#state{mqtt_fsm=SessionPid, client=ClientId}}.
@@ -382,6 +384,7 @@ publish(State, _Meta, Topic, Payload, QoS) ->
     publish(State, _Meta, Topic, Payload, QoS, false).
 
 publish(#state{mqtt_fsm = SessionPid} = State, _Meta, Topic, Payload, QoS, Retain) ->
+    lager:warning("The State Options in publish ~p <<", [State]),
     case vmq_topic:validate_topic(publish, list_to_binary(Topic)) of
         {ok, TTopic} ->
             Payload1 = term_to_binary({os:timestamp(), Payload}),
