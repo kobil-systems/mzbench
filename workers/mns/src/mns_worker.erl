@@ -245,7 +245,7 @@ mns_register(State, Meta, Endpoint, MacPrefix) ->
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQPassword}=re:run(ResponseBody, "guardian_mqtt.*mqToken\":\"([^\"]*)", [{capture, all_but_first, list}]),
-    {nil, State#state{network_mac = FinalMacPrefix, network_id = array:get(0, NetworkId), guardian_id = array:get(0, GuardianId), mq_server = array:get(0, MQServer) mq_password = array:get(0, MQPassword)}}.
+    {nil, State#state{network_mac = FinalMacPrefix, network_id = array:get(0, NetworkId), guardian_id = array:get(0, GuardianId), mq_server = array:get(0, MQServer), mq_password = array:get(0, MQPassword)}}.
     
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
