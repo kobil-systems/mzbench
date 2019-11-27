@@ -286,6 +286,7 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
             {proto_version , 4},
             {reconnect_timeout,4}
             ]),
+    lager:warning("The FutureState ~p <<", [NewState]),
     %#state.mqtt_fsm=SessionPid, client=ClientId}}
     {nil, State}.
 
