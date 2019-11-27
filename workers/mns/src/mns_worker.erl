@@ -288,7 +288,7 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
             ]),
     lager:warning("The FutureState ~p <<", [NewState]),
     %#state.mqtt_fsm=SessionPid, client=ClientId}}
-    {nil, State}.
+    {nil, NewState}.
 
 
 
