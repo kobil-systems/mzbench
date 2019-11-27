@@ -294,7 +294,7 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
 
 -spec mq_cluster_publish(state(), meta()) -> {nil, state()}.
 mq_cluster_publish(#state{network_mac = FinalMacPrefix, string_mac = StringMacPrefix } = State, Meta) ->
-    NetworkID=substr(StringMacPrefix,5,9),
+    NetworkID=re:replace(StringMacPrefix,"^.{6}", ""),
     lager:warning("Network Prefix Majiggy: ~p ",[NetworkID]).
 
 
