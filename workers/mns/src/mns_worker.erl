@@ -28,7 +28,8 @@
     load_client_key/3,
     load_cas/3,
     get_cert_bin/1,
-    mq_cluster_connect/2]).
+    mq_cluster_connect/2,
+    mq_cluster_publish/2]).
 
 % gen_mqtt stats callback
 -export([stats/2]).
@@ -88,6 +89,7 @@
     , prefix = "default"
     , http_options = [] :: http_options()
     , network_mac
+    , string_mac
     , network_id
     , guardian_id
     , mq_server
@@ -245,7 +247,7 @@ mns_register(State, Meta, Endpoint, MacPrefix) ->
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQPassword}=re:run(ResponseBody, "guardian_mqtt.*mqToken\":\"([^\"]*)", [{capture, all_but_first, list}]),
-    {nil, State#state{network_mac = FinalMacPrefix, network_id = lists:concat(NetworkId), guardian_id = lists:concat(GuardianId), mq_server = lists:concat(MQServer), mq_password = lists:concat(MQPassword)}}.
+    {nil, State#state{network_mac = FinalMacPrefix, string_mac = StringMacPrefix, network_id = lists:concat(NetworkId), guardian_id = lists:concat(GuardianId), mq_server = lists:concat(MQServer), mq_password = lists:concat(MQPassword)}}.
     
 
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
@@ -290,6 +292,10 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
     %#state.mqtt_fsm=SessionPid, client=ClientId}}
     {nil, NewState}.
 
+-spec mq_cluster_publish(state(), meta()) -> {nil, state()}.
+mq_cluster_publish(#state{network_mac = FinalMacPrefix, string_mac = StringMacPrefix } = State, Meta) ->
+    NetworkID=substr(StringMacPrefix,5,9),
+    lager:warning("Network Prefix Majiggy: ~p ",[NetworkID]).
 
 
 
