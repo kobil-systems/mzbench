@@ -234,16 +234,13 @@ mns_register(State, Meta, Endpoint, MacPrefix) ->
     GKHeaders = [{<<"Content-Type">>, <<"application/json">>}],
     {WorkerId, State} = worker_id(State, Meta),
     StringMacPrefix = io_lib:format("~2..0B~8..0B", [MacPrefix, WorkerId ]),
-    lager:warning("The workerID ~p <<", [StringMacPrefix]),
     FinalMacPrefix = re:replace(StringMacPrefix,"[0-9]{2}", "&:", [global, {return, list}]),
     JsonOutput = io_lib:format("{\"radar_status\": {\"deviceId\": \"test-~s\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"ETHERNET\", \"mac\": \"~s01\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s10\", \"peer_type\": \"7\"}, {\"mac\": \"~s20\", \"peer_type\": \"7\"}, {\"mac\": \"~s30\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s02\", \"ap_bssid_5ghz\": \"~s:03\", \"mesh_bssid\": \"~s:00\", \"gateway_bssid\": \"ff:00:00:00:00:00\", \"root_mode\": 2}, \"factory_reset\": \"False\", \"master_failed\": \"False\", \"location_id\": \"~s:00\"}", [StringMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix]),
     %gk_connect( #state{gk_connection = GK_connection} = State, Meta,"mns.load.qa.wifimotion.ca", 443),
     set_options(State, Meta, GKHeaders),
     %Payload = <<"potato">>,
-    lager:warning("The state ~p <<", [State]),
     Path = <<"/gatekeeper">>,
     {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
-    lager:warning("The state ~p and otherstate: ~p <<", [State, OtherState]),
     MQUsername = <<"device">>,
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
@@ -290,7 +287,6 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
             {proto_version , 4},
             {reconnect_timeout,4}
             ]),
-    lager:warning("The FutureState ~p <<", [NewState]),
     %#state.mqtt_fsm=SessionPid, client=ClientId}}
     {nil, NewState}.
 
