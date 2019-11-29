@@ -231,6 +231,7 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
 
 -spec mns_register(state(), meta(), string(), integer()) -> {nil,state()}.
 mns_register(State, Meta, Endpoint, MacPrefix) ->
+    lager:warning("timestamp: ~s", os:timestamp()),
     GKHeaders = [{<<"Content-Type">>, <<"application/json">>}],
     {WorkerId, State} = worker_id(State, Meta),
     StringMacPrefix = io_lib:format("~2..0B~8..0B", [MacPrefix, WorkerId ]),
