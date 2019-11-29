@@ -29,7 +29,7 @@
     load_cas/3,
     get_cert_bin/1,
     mq_cluster_connect/2,
-    mq_cluster_publish/2,
+    mq_cluster_publish_motion/2,
     mq_cluster_publish_guardian/2,
     mq_cluster_publish_heartbeat/2]).
 
@@ -296,7 +296,7 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
     {nil, NewState}.
 
 -spec mq_cluster_publish_motion(state(), meta()) -> {nil, state()}.
-mq_cluster_publish(#state{network_mac = MacPrefix~12string_mac = StringMacPrefix, guardian_id = GuardianId, network_id = NetworkID } = State, Meta) ->
+mq_cluster_publish_motion(#state{network_mac = MacPrefix~12string_mac = StringMacPrefix, guardian_id = GuardianId, network_id = NetworkID } = State, Meta) ->
     NetworkID = re:replace(StringMacPrefix,"^.{6}", "", [{return, list}]),
     PublishLocation = io_lib:format("iot-2/type/guardian/id/~s/evt/motion-matrix/fmt/json",[GuardianId]),
     
