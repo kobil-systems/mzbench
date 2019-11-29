@@ -330,7 +330,7 @@ mq_cluster_publish_heartbeat(#state{network_mac = MacPrefix, string_mac = String
     PublishLocation = io_lib:format("iot-2/type/~s/id/~s/evt/guardian-status/fmt/json",[MQType, GuardianId]),
     
     %Guardian
-    MQmessage = io_lib:format"({'ts': ~s, 'guardian_id': '~s', 'network_id': ~s, 'last_motion': 946685095, 'motion_tripped': 0, 'motion_enabled': 1}",[Timestamp, GuardianId, NetworkID]),
+    MQmessage = io_lib:format("{'ts': ~s, 'guardian_id': '~s', 'network_id': ~s, 'last_motion': 946685095, 'motion_tripped': 0, 'motion_enabled': 1}",[Timestamp, GuardianId, NetworkID]),
     publish(State, Meta, PublishLocation, MQmessage, 0),
     {nil,State}.
 
