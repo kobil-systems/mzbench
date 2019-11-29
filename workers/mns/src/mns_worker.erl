@@ -296,7 +296,7 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
     {nil, NewState}.
 
 -spec mq_cluster_publish_motion(state(), meta()) -> {nil, state()}.
-mq_cluster_publish_motion(#state{network_mac = MacPrefix~12string_mac = StringMacPrefix, guardian_id = GuardianId, network_id = NetworkID } = State, Meta) ->
+mq_cluster_publish_motion(#state{network_mac = MacPrefix, string_mac = StringMacPrefix, guardian_id = GuardianId, network_id = NetworkID } = State, Meta) ->
     NetworkID = re:replace(StringMacPrefix,"^.{6}", "", [{return, list}]),
     PublishLocation = io_lib:format("iot-2/type/guardian/id/~s/evt/motion-matrix/fmt/json",[GuardianId]),
     
