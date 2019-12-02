@@ -437,6 +437,7 @@ publish(#state{mqtt_fsm = SessionPid} = State, _Meta, Topic, Payload, QoS, Retai
     case vmq_topic:validate_topic(publish, list_to_binary(Topic)) of
         {ok, TTopic} ->
             Payload1 = term_to_binary({os:timestamp(), Payload}),
+            lager:warning("The State payload # ~p #", [Payload1]),
             gen_emqtt:publish(SessionPid, TTopic, Payload1, QoS, Retain),
             mzb_metrics:notify({"mqtt.message.published.total", counter}, 1),
             {nil, State};
