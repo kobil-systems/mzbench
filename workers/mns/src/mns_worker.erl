@@ -235,7 +235,6 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
 -spec mns_register(state(), meta(), string(), integer()) -> {nil,state()}.
 mns_register(State, Meta, Endpoint, MacPrefix) ->
     {Big, Medium, Small} = os:timestamp(),
-    lager:warning("timestamp: ~p . ~p . ~p", [Big, Medium, Small]),
     GKHeaders = [{<<"Content-Type">>, <<"application/json">>}],
     {WorkerId, State} = worker_id(State, Meta),
     StringMacPrefix = io_lib:format("~2..0B~8..0B", [MacPrefix, WorkerId ]),
@@ -252,8 +251,7 @@ mns_register(State, Meta, Endpoint, MacPrefix) ->
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQPassword}=re:run(ResponseBody, "guardian_mqtt.*mqToken\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQType}=re:run(ResponseBody, "guardian_mqtt.*mqType\":\"([^\"]*)", [{capture, all_but_first, list}]),
-    lager:warning("The whole message = ~p", [ResponseBody]),
-    lager:warning("ID's Guardian: ~p NetworkId: ~p Mac String: ~p Mac: ~p", [GuardianId,NetworkId, StringMacPrefix, FinalMacPrefix]),
+    lager:info("ID's Guardian: ~p NetworkId: ~p Mac String: ~p Mac: ~p", [GuardianId,NetworkId, StringMacPrefix, FinalMacPrefix]),
     {nil, State#state{network_mac = FinalMacPrefix, string_mac = StringMacPrefix, network_id = lists:concat(NetworkId), guardian_id = lists:concat(GuardianId), mq_server = lists:concat(MQServer), mq_password = lists:concat(MQPassword), mq_type = lists:concat(MQType)}}.
     
 
@@ -320,7 +318,6 @@ mq_cluster_publish_guardian(#state{network_mac = MacPrefix, string_mac = StringM
     %Guardian
     %MQmessage = <<"{'ts': #time#, 'guardian_id': '#guardian#', 'network_id': #network#, 'radars': [{'deviceId': 'test-#sys#01', 'ts': 0.0, 'interfaces': [{'name': 'wan0', 'type': 'ETHERNET', 'mac': '#mac#01', 'ip': '10.22.22.1', 'routes': [{'dst': '0.0.0.0'}]}], 'links': [{'mac': '#mac#10', 'peer_type': '7'}, {'mac': '#mac#20', 'peer_type': '7'}, {'mac': '#mac#30', 'peer_type': '2'}], 'ap_bssid_2ghz': '#mac#02', 'ap_bssid_5ghz': '#mac#03', 'mesh_bssid': '#mac#00', 'gateway_bssid': 'ff:00:00:00:00:00', 'root_mode': 2}, {'deviceId': 'test-#sys#11', 'ts': 0.0, 'interfaces': [{'name': 'wan0', 'type': 'BRIDGE', 'mac': '#mac#11', 'ip': '10.22.22.1', 'routes': [{'dst': '0.0.0.0'}]}], 'links': [{'mac': '#mac#00', 'peer_type': '7'}, {'mac': '#mac#20', 'peer_type': '7'}, {'mac': '#mac#40', 'peer_type': '2'}], 'ap_bssid_2ghz': '#mac#12', 'ap_bssid_5ghz': '#mac#13', 'mesh_bssid': '#mac#10', 'gateway_bssid': '#mac#00', 'root_mode': 1}, {'deviceId': 'test-#sys#21', 'ts': 0.0, 'interfaces': [{'name': 'wan0', 'type': 'BRIDGE', 'mac': '#mac#21', 'ip': '10.22.22.1', 'routes': [{'dst': '0.0.0.0'}]}], 'links': [{'mac': '#mac#00', 'peer_type': '7'}, {'mac': '#mac#10', 'peer_type': '7'}, {'mac': '#mac#50', 'peer_type': '2'}], 'ap_bssid_2ghz': '#mac#22', 'ap_bssid_5ghz': '#mac#23', 'mesh_bssid': '#mac#20', 'gateway_bssid': '#mac#00', 'root_mode': 1}], 'last_motion': 946685095}">>,
     MQmessage = io_lib:format(<<"{\"ts\": ~s, \"guardian_id\": \"~s\", \"network_id\": ~s, \"radars\": [{\"deviceId\": \"test-~s01\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"ETHERNET\", \"mac\": \"~s01\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s:10\", \"peer_type\": \"7\"}, {\"mac\": \"~s:20\", \"peer_type\": \"7\"}, {\"mac\": \"~s:30\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s:02\", \"ap_bssid_5ghz\": \"~s:03\", \"mesh_bssid\": \"~s:00\", \"gateway_bssid\": \"ff:00:00:00:00:00\", \"root_mode\": 2}, {\"deviceId\": \"test-~s11\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"BRIDGE\", \"mac\": \"~s:11\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s:00\", \"peer_type\": \"7\"}, {\"mac\": \"~s:20\", \"peer_type\": \"7\"}, {\"mac\": \"~s:40\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s:12\", \"ap_bssid_5ghz\": \"~s:13\", \"mesh_bssid\": \"~s:10\", \"gateway_bssid\": \"~s:00\", \"root_mode\": 1}, {\"deviceId\": \"test-~s21\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"BRIDGE\", \"mac\": \"~s:21\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s:00\", \"peer_type\": \"7\"}, {\"mac\": \"~s:10\", \"peer_type\": \"7\"}, {\"mac\": \"~s:50\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s:22\", \"ap_bssid_5ghz\": \"~s:23\", \"mesh_bssid\": \"~s:20\", \"gateway_bssid\": \"~s:00\", \"root_mode\": 1}], \"last_motion\": 946685095}">>,[Timestamp,GuardianId,NetworkID,SysId,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix,SysId,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix,SysId,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix,MacPrefix]),
-    lager:warning("message: ~p",[MQmessage]),
     publish(State, Meta, PublishLocation, MQmessage, 0),
     {nil,State}.
 
@@ -439,7 +436,6 @@ publish(#state{mqtt_fsm = SessionPid} = State, _Meta, Topic, Payload, QoS, Retai
             {BigTime, MediumTime, SmallTime} = os:timestamp(),
             Timestamp = io_lib:format("~4..0B~5..0B~6..0B", [BigTime, MediumTime, SmallTime]),
             Payload1 = term_to_binary(Payload),
-            lager:warning("The State payload # ~p #", [Payload1]),
             gen_emqtt:publish(SessionPid, TTopic, Payload, QoS, Retain),
             mzb_metrics:notify({"mqtt.message.published.total", counter}, 1),
             {nil, State};
