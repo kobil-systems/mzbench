@@ -440,7 +440,7 @@ publish(#state{mqtt_fsm = SessionPid} = State, _Meta, Topic, Payload, QoS, Retai
             Timestamp = io_lib:format("~4..0B~5..0B~5..0B", [BigTime, MediumTime, SmallTime]),
             Payload1 = term_to_binary(Payload),
             lager:warning("The State payload # ~p #", [Payload1]),
-            gen_emqtt:publish(SessionPid, TTopic, Payload1, QoS, Retain),
+            gen_emqtt:publish(SessionPid, TTopic, Payload, QoS, Retain),
             mzb_metrics:notify({"mqtt.message.published.total", counter}, 1),
             {nil, State};
         {error, Reason} ->
