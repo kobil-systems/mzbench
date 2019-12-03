@@ -302,7 +302,7 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
 mq_cluster_publish_motion(#state{network_mac = MacPrefix, string_mac = StringMacPrefix, guardian_id = GuardianId, network_id = NetworkID, mq_type = MQType } = State, Meta) ->
     SysId = re:replace(StringMacPrefix,"^.{6}", "", [{return, list}]),
     {BigTime, MediumTime, SmallTime} = os:timestamp(),
-    Timestamp = io_lib:format("~4..0B~5..0B", [BigTime, MediumTime ]),
+    Timestamp = io_lib:format("~4..0B~6..0B", [BigTime, MediumTime ]),
     PublishLocation = io_lib:format("iot-2/type/~s/id/~s/evt/motion-matrix/fmt/json",[MQType, GuardianId]),
     
     %MotionMatrix
@@ -314,7 +314,7 @@ mq_cluster_publish_motion(#state{network_mac = MacPrefix, string_mac = StringMac
 mq_cluster_publish_guardian(#state{network_mac = MacPrefix, string_mac = StringMacPrefix, guardian_id = GuardianId, network_id = NetworkID, mq_type = MQType } = State, Meta) ->
     SysId = re:replace(StringMacPrefix,"^.{6}", "", [{return, list}]),
     {BigTime, MediumTime, SmallTime} = os:timestamp(),
-    Timestamp = io_lib:format("~4..0B~5..0B", [BigTime, MediumTime ]),
+    Timestamp = io_lib:format("~4..0B~6..0B", [BigTime, MediumTime ]),
     PublishLocation = io_lib:format("iot-2/type/~s/id/~s/evt/guardian-status/fmt/json",[MQType, GuardianId]),
     
     %Guardian
@@ -328,7 +328,7 @@ mq_cluster_publish_guardian(#state{network_mac = MacPrefix, string_mac = StringM
 mq_cluster_publish_heartbeat(#state{network_mac = MacPrefix, string_mac = StringMacPrefix, guardian_id = GuardianId, network_id = NetworkID, mq_type = MQType } = State, Meta) ->
     SysId = re:replace(StringMacPrefix,"^.{6}", "", [{return, list}]),
     {BigTime, MediumTime, SmallTime} = os:timestamp(),
-    Timestamp = io_lib:format("~4..0B~5..0B", [BigTime, MediumTime ]),
+    Timestamp = io_lib:format("~4..0B~6..0B", [BigTime, MediumTime ]),
     PublishLocation = io_lib:format("iot-2/type/~s/id/~s/evt/guardian-status/fmt/json",[MQType, GuardianId]),
     
     %Guardian
@@ -437,7 +437,7 @@ publish(#state{mqtt_fsm = SessionPid} = State, _Meta, Topic, Payload, QoS, Retai
     case vmq_topic:validate_topic(publish, list_to_binary(Topic)) of
         {ok, TTopic} ->
             {BigTime, MediumTime, SmallTime} = os:timestamp(),
-            Timestamp = io_lib:format("~4..0B~5..0B~5..0B", [BigTime, MediumTime, SmallTime]),
+            Timestamp = io_lib:format("~4..0B~5..0B~6..0B", [BigTime, MediumTime, SmallTime]),
             Payload1 = term_to_binary(Payload),
             lager:warning("The State payload # ~p #", [Payload1]),
             gen_emqtt:publish(SessionPid, TTopic, Payload, QoS, Retain),
