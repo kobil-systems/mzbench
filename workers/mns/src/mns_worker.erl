@@ -251,7 +251,7 @@ mns_register(State, Meta, Endpoint, MacPrefix) ->
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQPassword}=re:run(ResponseBody, "guardian_mqtt.*mqToken\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQType}=re:run(ResponseBody, "guardian_mqtt.*mqType\":\"([^\"]*)", [{capture, all_but_first, list}]),
-    lager:info("ID's Guardian: ~p NetworkId: ~p Mac String: ~p Mac: ~p", [GuardianId,NetworkId, StringMacPrefix, FinalMacPrefix]),
+    lager:info("ID's Guardian: ~p NetworkId: ~p Mac String: ~p Mac: ~p MQ: ~p", [GuardianId,NetworkId, StringMacPrefix, FinalMacPrefix,MQServer]),
     {nil, State#state{network_mac = FinalMacPrefix, string_mac = StringMacPrefix, network_id = lists:concat(NetworkId), guardian_id = lists:concat(GuardianId), mq_server = lists:concat(MQServer), mq_password = lists:concat(MQPassword), mq_type = lists:concat(MQType)}}.
     
 
