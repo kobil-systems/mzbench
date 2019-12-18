@@ -246,7 +246,7 @@ mns_register(State, Meta, Endpoint, MacPrefix) ->
     Path = <<"/gatekeeper">>,
     {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
     MQUsername = <<"device">>,
-    {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}])
+    {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
     lager:info("GateKeeper response: ~p", [ResponseBody]),
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
