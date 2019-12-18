@@ -249,7 +249,8 @@ mns_register(State, Meta, Endpoint, MacPrefix) ->
     try 
         {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}])
     catch
-        lager:error("GateKeeper:response fail: ~p", [ResponseBody])
+        _:_ ->
+            lager:error("GateKeeper:response fail: ~p", [ResponseBody])
     end,
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
