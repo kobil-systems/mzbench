@@ -256,7 +256,7 @@ mns_register(State, Meta, Endpoint, MacPrefix) ->
             lager:warning("GateKeeper response: ~p", [ResponseBody]),
             {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput);
         true ->
-            mzb_metrics:notify({Prefix ++ ".success", counter}, 1),
+            mzb_metrics:notify({Prefix ++ ".success", counter}, 1)
     end
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
