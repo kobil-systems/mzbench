@@ -236,7 +236,7 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
     { hackney:body(GK_connection), State#state{gk_connection = record_response(Prefix, Response)}}.
 
 -spec mns_register(state(), meta(), string(), integer()) -> {nil,state()}.
-mns_register(State, Meta, Endpoint, MacPrefix) ->
+mns_register(#state={prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
     {Big, Medium, Small} = os:timestamp(),
     GKHeaders = [{<<"Content-Type">>, <<"application/json">>}],
     {WorkerId, State} = worker_id(State, Meta),
