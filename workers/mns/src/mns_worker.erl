@@ -133,8 +133,8 @@ metrics(Prefix) ->
                       units => "microseconds",
                       metrics => [{Prefix ++ ".http_latency", histogram}]}},
             {graph, #{title => "MNS Retry statement",
-                      units => "microseconds",
-                      metrics => [{Prefix ++ ".success", histogram},{Prefix ++ ".retry", histogram}]}}
+                      units => "N",
+                      metrics => [{Prefix ++ ".success", counter},{Prefix ++ ".retry", counter}]}}
         ]},
         {group, "MQTT Pub to Sub Latency", [
             {graph, #{title => "Pub to Sub Latency (QoS 0)", metrics => [{"mqtt.message.pub_to_sub.latency", histogram}]}},
