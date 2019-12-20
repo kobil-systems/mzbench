@@ -131,7 +131,10 @@ metrics(Prefix) ->
                       metrics => [{Prefix ++ ".http_ok", counter}, {Prefix ++ ".http_fail", counter}, {Prefix ++ ".other_fail", counter}]}},
             {graph, #{title => "HTTP Latency",
                       units => "microseconds",
-                      metrics => [{Prefix ++ ".http_latency", histogram}]}}
+                      metrics => [{Prefix ++ ".http_latency", histogram}]}},
+            {graph, #{title => "MNS Retry statement",
+                      units => "microseconds",
+                      metrics => [{Prefix ++ ".success", histogram},{Prefix ++ ".retry", histogram}]}}
         ]},
         {group, "MQTT Pub to Sub Latency", [
             {graph, #{title => "Pub to Sub Latency (QoS 0)", metrics => [{"mqtt.message.pub_to_sub.latency", histogram}]}},
@@ -246,7 +249,15 @@ mns_register(State, Meta, Endpoint, MacPrefix) ->
     Path = <<"/gatekeeper">>,
     {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
     MQUsername = <<"device">>,
-    lager:info("GateKeeper response: ~p", [ResponseBody]),
+    RetryCheck = str(ResponseBody, "TRYAGAIN"),
+    if
+        RetryCheck > 0 ->
+            mzb_metrics:notify({Prefix ++ ".retry", counter}, 1),
+            lager:warning("GateKeeper response: ~p", [ResponseBody]),
+            {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput);
+        true ->
+            mzb_metrics:notify({Prefix ++ ".success", counter}, 1),
+    end
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
