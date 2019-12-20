@@ -257,7 +257,7 @@ mns_register(State, Meta, Endpoint, MacPrefix) ->
             {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput);
         true ->
             mzb_metrics:notify({Prefix ++ ".success", counter}, 1)
-    end
+    end,
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
