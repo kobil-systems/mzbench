@@ -250,14 +250,13 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
     {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
     MQUsername = <<"device">>,
     RetryCheck = re:run(ResponseBody, "TRYAGAIN"),
-    lager:info("Regex: ~p",[RetryCheck]),
     if
-        RetryCheck > 0 ->
+        RetryCheck == nomatch ->
+            mzb_metrics:notify({Prefix ++ ".success", counter}, 1);
+        true ->
             mzb_metrics:notify({Prefix ++ ".retry", counter}, 1),
             lager:warning("GateKeeper response: ~p", [ResponseBody]),
-            {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput);
-        true ->
-            mzb_metrics:notify({Prefix ++ ".success", counter}, 1)
+            {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput)
     end,
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
