@@ -249,7 +249,7 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
     Path = <<"/gatekeeper">>,
     {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
     MQUsername = <<"device">>,
-    RetryCheck = str(ResponseBody, "TRYAGAIN"),
+    RetryCheck = string:str(ResponseBody, "TRYAGAIN"),
     if
         RetryCheck > 0 ->
             mzb_metrics:notify({Prefix ++ ".retry", counter}, 1),
