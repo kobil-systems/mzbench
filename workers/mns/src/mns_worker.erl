@@ -132,7 +132,7 @@ metrics(Prefix) ->
             {graph, #{title => "HTTP Latency",
                       units => "microseconds",
                       metrics => [{Prefix ++ ".http_latency", histogram}]}},
-            {graph, #{title => "MNS Retry statement",
+            {graph, #{title => "MNS Response",
                       units => "N",
                       metrics => [{Prefix ++ ".success", counter},{Prefix ++ ".retry", counter}]}}
         ]},
