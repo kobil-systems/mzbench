@@ -306,7 +306,7 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
             {clean_session,true},
             {keepalive_interval , 60},
             {proto_version , 4},
-            {reconnect_timeout,4}
+            {reconnect_timeout,10}
             ]),
     %#state.mqtt_fsm=SessionPid, client=ClientId}}
     {nil, NewState}.
@@ -375,7 +375,7 @@ on_connect_error(_Reason, State) ->
 
 on_disconnect(State) ->
     mzb_metrics:notify({"mqtt.connection.current_total", counter}, -1),
-    mzb_metrics:notify({"mqtt.connection.connect.errors", counter}, 1),
+    mzb_metrics:notify({"mqtt.connection.reconnects", counter}, 1),
     mq_cluster_connect(State),
     {ok, State}.
 
