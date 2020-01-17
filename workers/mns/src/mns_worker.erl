@@ -375,6 +375,8 @@ on_connect_error(_Reason, State) ->
 
 on_disconnect(State) ->
     mzb_metrics:notify({"mqtt.connection.current_total", counter}, -1),
+    mzb_metrics:notify({"mqtt.connection.connect.errors", counter}, 1),
+    mq_cluster_connect(State),
     {ok, State}.
 
 on_subscribe(Topics, State) ->
