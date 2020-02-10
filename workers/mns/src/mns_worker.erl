@@ -165,6 +165,7 @@ metrics(Prefix) ->
         {group, "MQTT Connections", [
             {graph, #{title => "Connack Latency", metrics => [{"mqtt.connection.connack.latency", histogram}]}},
             {graph, #{title => "Total Connections", metrics => [{"mqtt.connection.current_total", counter}]}},
+            {graph, #{title => "Total Cluster Connect Success", metrics => [{"mqtt.connection.cluster_total", counter}]}},
             {graph, #{title => "Connection errors", metrics => [{"mqtt.connection.connect.errors", histogram}]}},
             {graph, #{title => "Reconnects", metrics => [{"mqtt.connection.reconnects", counter}]}}
         ]},
@@ -308,6 +309,7 @@ mq_cluster_connect(#state{network_mac = FinalMacPrefix, network_id = NetworkId, 
             {proto_version , 4},
             {reconnect_timeout,10}
             ]),
+    mzb_metrics:notify({"mqtt.connection.cluster_total", counter}, 1),
     %#state.mqtt_fsm=SessionPid, client=ClientId}}
     {nil, NewState}.
 
@@ -375,6 +377,7 @@ on_connect_error(_Reason, State) ->
 
 on_disconnect(State) ->
     mzb_metrics:notify({"mqtt.connection.current_total", counter}, -1),
+    mzb_metrics:notify({"mqtt.connection.cluster_total", counter}, -1),
     mzb_metrics:notify({"mqtt.connection.reconnects", counter}, 1),
     mq_cluster_connect(State, ""),
     {ok, State}.
@@ -423,6 +426,8 @@ handle_info(_Req, State) ->
 
 terminate(_Reason, _State) ->
     mzb_metrics:notify({"mqtt.connection.current_total", counter}, -1),
+    mzb_metrics:notify({"mqtt.connection.reconnects", counter}, 1),
+    mq_cluster_connect(State, ""),
     ok.
 
 code_change(_OldVsn, State, _Extra) ->
