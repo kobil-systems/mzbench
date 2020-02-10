@@ -256,7 +256,7 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
             mzb_metrics:notify({Prefix ++ ".success", counter}, 1);
         true ->
             mzb_metrics:notify({Prefix ++ ".retry", counter}, 1),
-            lager:warning("GateKeeper response: ~p", [ResponseBody]),
+            %lager:warning("GateKeeper response: ~p", [ResponseBody]),
             {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput)
     end,
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
@@ -264,7 +264,7 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQPassword}=re:run(ResponseBody, "guardian_mqtt.*mqToken\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQType}=re:run(ResponseBody, "guardian_mqtt.*mqType\":\"([^\"]*)", [{capture, all_but_first, list}]),
-    lager:info("ID's Guardian: ~p NetworkId: ~p Mac String: ~p Mac: ~p MQ: ~p", [GuardianId,NetworkId, StringMacPrefix, FinalMacPrefix,MQServer]),
+    %lager:info("ID's Guardian: ~p NetworkId: ~p Mac String: ~p Mac: ~p MQ: ~p", [GuardianId,NetworkId, StringMacPrefix, FinalMacPrefix,MQServer]),
     JsonDevice2 = io_lib:format("{\"radar_status\": {\"deviceId\": \"test-~s11\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"BRIDGE\", \"mac\": \"~s11\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s00\", \"peer_type\": \"7\"}, {\"mac\": \"~s20\", \"peer_type\": \"7\"}, {\"mac\": \"~s30\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s12\", \"ap_bssid_5ghz\": \"~s13\", \"mesh_bssid\": \"~s20\", \"gateway_bssid\": \"01:00:01:00:01:00\", \"root_mode\": 1}, \"factory_reset\": \"False\", \"master_failed\": \"False\", \"location_id\": \"~s00\"}", [StringMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix]),
     {{ok,SecondResponseBody}, SecondState} = gk_post(State, Meta, Path,  JsonDevice2),
     JsonDevice3 = io_lib:format("{\"radar_status\": {\"deviceId\": \"test-~s21\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"BRIDGE\", \"mac\": \"~s21\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s00\", \"peer_type\": \"7\"}, {\"mac\": \"~s20\", \"peer_type\": \"7\"}, {\"mac\": \"~s30\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s22\", \"ap_bssid_5ghz\": \"~s23\", \"mesh_bssid\": \"~s30\", \"gateway_bssid\": \"01:00:01:00:01:00\", \"root_mode\": 1}, \"factory_reset\": \"False\", \"master_failed\": \"False\", \"location_id\": \"~s00\"}", [StringMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix]),
