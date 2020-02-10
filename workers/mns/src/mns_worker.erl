@@ -427,7 +427,7 @@ handle_info(_Req, State) ->
 terminate(_Reason, _State) ->
     mzb_metrics:notify({"mqtt.connection.current_total", counter}, -1),
     mzb_metrics:notify({"mqtt.connection.reconnects", counter}, 1),
-    mq_cluster_connect(State, ""),
+    mq_cluster_connect(_State, ""),
     ok.
 
 code_change(_OldVsn, State, _Extra) ->
