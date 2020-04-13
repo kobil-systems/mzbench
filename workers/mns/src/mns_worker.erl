@@ -245,7 +245,7 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
             %lager:warning("GateKeeper response: ~p", [ResponseBody]),
             {{ok,Response}, State} = gk_post(State, _Meta, Endpoint,  Payload)
     end,
-    { hackney:body(GK_connection), State#state{gk_connection = record_response(Prefix, Response)}}.
+    { ResponsePayload, State#state{gk_connection = record_response(Prefix, Response)}}.
 
 
 
@@ -262,7 +262,7 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
     set_options(State, Meta, GKHeaders),
     %Payload = <<"potato">>,
     Path = <<"/gatekeeper">>,
-    {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
+    {ResponseBody, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
     MQUsername = <<"device">>,
     RetryCheck = re:run(ResponseBody, "TRYAGAIN"),
     if
