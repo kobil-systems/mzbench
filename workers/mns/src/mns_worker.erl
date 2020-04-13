@@ -235,7 +235,7 @@ gk_post(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
 gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Options} = State, _Meta, Endpoint, Payload) ->
     Response = ?TIMED(Prefix ++ ".http_latency", hackney:send_request(GK_connection,
         {post, Endpoint, Options, Payload})),
-    {ok, ResponsePayload} =  hackney:body(GK_connection)
+    {ok, ResponsePayload} =  hackney:body(GK_connection),
     RetryCheck = re:run(ResponsePayload, "TRYAGAIN"),
     if
         RetryCheck == nomatch ->
