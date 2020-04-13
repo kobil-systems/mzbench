@@ -235,7 +235,19 @@ gk_post(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
 gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Options} = State, _Meta, Endpoint, Payload) ->
     Response = ?TIMED(Prefix ++ ".http_latency", hackney:send_request(GK_connection,
         {post, Endpoint, Options, Payload})),
+    RetryCheck = re:run(Response, "TRYAGAIN"),
+    if
+        RetryCheck == nomatch ->
+            mzb_metrics:notify({Prefix ++ ".success", counter}, 1);
+        true ->
+            mzb_metrics:notify({Prefix ++ ".retry", counter}, 1),
+            %lager:warning("GateKeeper response: ~p", [ResponseBody]),
+            {{ok,Response}, OtherState} = gk_post(State, _Meta, Endpoint,  Payload)
+    end,
     { hackney:body(GK_connection), State#state{gk_connection = record_response(Prefix, Response)}}.
+
+
+
 
 -spec mns_register(state(), meta(), string(), integer()) -> {nil,state()}.
 mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
