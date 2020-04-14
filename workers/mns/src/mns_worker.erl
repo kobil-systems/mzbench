@@ -235,7 +235,7 @@ gk_post(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
 gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Options} = State, _Meta, Endpoint, Payload) ->
     Response = ?TIMED(Prefix ++ ".http_latency", hackney:send_request(GK_connection,
         {post, Endpoint, Options, Payload})),
-    lager:warning("State response: ~p", [State]),
+    lager:warning("State response: ~p", [GK_connection]),
     {ok, ResponsePayload} =  hackney:body(GK_connection),
     lager:warning("GateKeeper response: ~p", [ResponsePayload]),
     RetryCheck = re:run(ResponsePayload, "TRYAGAIN"),
@@ -270,15 +270,6 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
     {ResponseBody, State} = gk_post(State, Meta, Path,  JsonOutput),
     mzb_metrics:notify({Prefix ++ ".http_master", counter}, 1),
     MQUsername = <<"device">>,
-    RetryCheck = re:run(ResponseBody, "TRYAGAIN"),
-    if
-        RetryCheck == nomatch ->
-            mzb_metrics:notify({Prefix ++ ".success", counter}, 1);
-        true ->
-            mzb_metrics:notify({Prefix ++ ".retry", counter}, 1),
-            %lager:warning("GateKeeper response: ~p", [ResponseBody]),
-            {ResponseBody, OtherState} = gk_post(State, Meta, Path,  JsonOutput)
-    end,
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
     {match,MQServer}=re:run(ResponseBody, "guardian_mqtt.*mqServer\":\"([^\"]*)", [{capture, all_but_first, list}]),
