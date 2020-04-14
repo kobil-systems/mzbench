@@ -129,7 +129,7 @@ metrics(Prefix) ->
         {group, "HTTP (" ++ Prefix ++ ")", [
             {graph, #{title => "HTTP Response",
                       units => "N",
-                      metrics => [{Prefix ++ ".http_ok", counter}, {Prefix ++ ".http_fail", counter}, {Prefix ++ ".other_fail", counter}]}},
+                      metrics => [{Prefix ++ ".http_ok", counter},{Prefix ++ ".http_master", counter},{Prefix ++ ".http_secondary", counter}, {Prefix ++ ".http_fail", counter}, {Prefix ++ ".other_fail", counter}]}},
             {graph, #{title => "HTTP Latency",
                       units => "microseconds",
                       metrics => [{Prefix ++ ".http_latency", histogram}]}},
@@ -265,6 +265,7 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
     %Payload = <<"potato">>,
     Path = <<"/gatekeeper">>,
     {ResponseBody, OtherState} = gk_post(State, Meta, Path,  JsonOutput),
+    mzb_metrics:notify({Prefix ++ ".http_master", counter}, 1),
     MQUsername = <<"device">>,
     RetryCheck = re:run(ResponseBody, "TRYAGAIN"),
     if
@@ -285,8 +286,10 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
     %lager:info("ID's Guardian: ~p NetworkId: ~p Mac String: ~p Mac: ~p MQ: ~p", [GuardianId,NetworkId, StringMacPrefix, FinalMacPrefix,MQServer]),
     JsonDevice2 = io_lib:format("{\"radar_status\": {\"deviceId\": \"test-~s11\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"BRIDGE\", \"mac\": \"~s11\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s00\", \"peer_type\": \"7\"}, {\"mac\": \"~s20\", \"peer_type\": \"7\"}, {\"mac\": \"~s30\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s12\", \"ap_bssid_5ghz\": \"~s13\", \"mesh_bssid\": \"~s20\", \"gateway_bssid\": \"01:00:01:00:01:00\", \"root_mode\": 1}, \"factory_reset\": \"False\", \"master_failed\": \"False\", \"location_id\": \"device-~s00\"}", [StringMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, StringMacPrefix]),
     {SecondResponseBody, SecondState} = gk_post(State, Meta, Path,  JsonDevice2),
+    mzb_metrics:notify({Prefix ++ ".http_secondary", counter}, 1),
     JsonDevice3 = io_lib:format("{\"radar_status\": {\"deviceId\": \"test-~s21\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"BRIDGE\", \"mac\": \"~s21\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s00\", \"peer_type\": \"7\"}, {\"mac\": \"~s20\", \"peer_type\": \"7\"}, {\"mac\": \"~s30\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s22\", \"ap_bssid_5ghz\": \"~s23\", \"mesh_bssid\": \"~s30\", \"gateway_bssid\": \"01:00:01:00:01:00\", \"root_mode\": 1}, \"factory_reset\": \"False\", \"master_failed\": \"False\", \"location_id\": \"device-~s00\"}", [StringMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, StringMacPrefix]),
     {ThirdResponseBody, ThirdState} = gk_post(State, Meta, Path,  JsonDevice3),
+    mzb_metrics:notify({Prefix ++ ".http_secondary", counter}, 1),
     {nil, State#state{network_mac = FinalMacPrefix, string_mac = StringMacPrefix, network_id = lists:concat(NetworkId), guardian_id = lists:concat(GuardianId), mq_server = lists:concat(MQServer), mq_password = lists:concat(MQPassword), mq_type = lists:concat(MQType)}}.
     
 -spec put(state(), meta(), string() | binary(), iodata()) -> {nil, state()}.
