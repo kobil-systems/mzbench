@@ -250,7 +250,7 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
             {ResponsePayload, State} = gk_post(State, _Meta, Endpoint,  Payload)
     end,
     record_response(Prefix, Response),
-    { ResponsePayload, State#state{gk_connection = GK_connection}}.
+    {ResponsePayload, State}.
 
 
 
