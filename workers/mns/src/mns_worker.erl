@@ -129,7 +129,7 @@ metrics(Prefix) ->
         {group, "HTTP (" ++ Prefix ++ ")", [
             {graph, #{title => "HTTP Response",
                       units => "N",
-                      metrics => [{Prefix ++ ".http_ok", counter},{Prefix ++ ".http_master", counter},{Prefix ++ ".http_secondary", counter}, {Prefix ++ ".http_fail", counter}, {Prefix ++ ".other_fail", counter}]}},
+                      metrics => [{Prefix ++ ".http_ok", counter},{Prefix ++ ".http_master", counter},{Prefix ++ ".http_secondary", counter}, {Prefix ++ ".http_mns_retry", counter},  {Prefix ++ ".http_fail", counter}, {Prefix ++ ".other_fail", counter}]}},
             {graph, #{title => "HTTP Latency",
                       units => "microseconds",
                       metrics => [{Prefix ++ ".http_latency", histogram}]}},
@@ -243,9 +243,10 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
             mzb_metrics:notify({Prefix ++ ".success", counter}, 1);
         true ->
             mzb_metrics:notify({Prefix ++ ".retry", counter}, 1),
+            mzb_metrics:notify({Prefix ++ ".http_mns_retry", counter}, 1),
             lager:warning("TRYAGAIN: ~p", [ResponsePayload]),
             timer:sleep(60000),
-            {{ok,Response}, State} = gk_post(State, _Meta, Endpoint,  Payload)
+            {Response, State} = gk_post(State, _Meta, Endpoint,  Payload)
     end,
     { ResponsePayload, State#state{gk_connection = record_response(Prefix, Response)}}.
 
