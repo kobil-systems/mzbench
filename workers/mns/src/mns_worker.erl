@@ -246,7 +246,7 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
             mzb_metrics:notify({Prefix ++ ".http_mns_retry", counter}, 1),
             lager:warning("TRYAGAIN: ~p", [ResponsePayload]),
             timer:sleep(60000),
-            {Response, State} = gk_post(State, _Meta, Endpoint,  Payload)
+            {ResponsePayload, State} = gk_post(State, _Meta, Endpoint,  Payload)
     end,
     { ResponsePayload, State#state{gk_connection = record_response(Prefix, Response)}}.
 
