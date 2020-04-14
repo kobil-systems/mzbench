@@ -275,7 +275,7 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
         true ->
             mzb_metrics:notify({Prefix ++ ".retry", counter}, 1),
             %lager:warning("GateKeeper response: ~p", [ResponseBody]),
-            {{ok,ResponseBody}, OtherState} = gk_post(State, Meta, Path,  JsonOutput)
+            {ResponseBody, OtherState} = gk_post(State, Meta, Path,  JsonOutput)
     end,
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
     {match,GuardianId}=re:run(ResponseBody, "guardian_mqtt.*guardian_id\":\"([^\"]*)", [{capture, all_but_first, list}]),
