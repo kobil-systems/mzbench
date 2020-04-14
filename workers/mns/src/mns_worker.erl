@@ -268,6 +268,7 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
     %Payload = <<"potato">>,
     Path = <<"/gatekeeper">>,
     {ResponseBody, State} = gk_post(State, Meta, Path,  JsonOutput),
+    {ResponseBody, State} = gk_post(State, Meta, Path,  JsonOutput),
     mzb_metrics:notify({Prefix ++ ".http_master", counter}, 1),
     MQUsername = <<"device">>,
     {match,NetworkId}=re:run(ResponseBody, "network_id\":([0-9]*)", [{capture, all_but_first, list}]),
