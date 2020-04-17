@@ -235,9 +235,7 @@ gk_post(State, Meta, Endpoint, Payload) when is_list(Endpoint) ->
 gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Options} = State, _Meta, Endpoint, Payload) ->
     Response = ?TIMED(Prefix ++ ".http_latency", hackney:send_request(GK_connection,
         {post, Endpoint, Options, Payload})),
-    lager:warning("State response: ~p", [GK_connection]),
     {ok, ResponsePayload} =  hackney:body(GK_connection),
-    lager:warning("GateKeeper response: ~p", [ResponsePayload]),
     RetryCheck = re:run(ResponsePayload, "TRYAGAIN"),
     if
         RetryCheck == nomatch ->
@@ -262,7 +260,7 @@ mns_register(#state{prefix = Prefix} = State, Meta, Endpoint, MacPrefix) ->
     {WorkerId, State} = worker_id(State, Meta),
     StringMacPrefix = io_lib:format("~2..0B~8..0B", [MacPrefix, WorkerId ]),
     FinalMacPrefix = re:replace(StringMacPrefix,"[0-9]{2}", "&:", [global, {return, list}]),
-    JsonOutput = io_lib:format("{\"radar_status\": {\"deviceId\": \"test-~s01\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"ETHERNET\", \"mac\": \"~s01\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s10\", \"peer_type\": \"7\"}, {\"mac\": \"~s20\", \"peer_type\": \"7\"}, {\"mac\": \"~s30\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s02\", \"ap_bssid_5ghz\": \"~s03\", \"mesh_bssid\": \"~s00\", \"gateway_bssid\": \"ff:00:00:00:00:00\", \"root_mode\": 2}, \"factory_reset\": \"False\", \"master_failed\": \"False\", \"location_id\": \"device-~s00\"}", [StringMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, StringMacPrefix]),
+    JsonOutput = io_lib:format("{\"radar_status\": {\"location_id\": \"device-~s00\", \"deviceId\": \"test-~s01\", \"ts\": 0.0, \"interfaces\": [{\"name\": \"wan0\", \"type\": \"ETHERNET\", \"mac\": \"~s01\", \"ip\": \"10.22.22.1\", \"routes\": [{\"dst\": \"0.0.0.0\"}]}], \"links\": [{\"mac\": \"~s10\", \"peer_type\": \"7\"}, {\"mac\": \"~s20\", \"peer_type\": \"7\"}, {\"mac\": \"~s30\", \"peer_type\": \"2\"}], \"ap_bssid_2ghz\": \"~s02\", \"ap_bssid_5ghz\": \"~s03\", \"mesh_bssid\": \"~s00\", \"gateway_bssid\": \"ff:00:00:00:00:00\", \"root_mode\": 2}, \"factory_reset\": \"False\", \"master_failed\": \"False\"}", [StringMacPrefix, StringMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix, FinalMacPrefix]),
     %gk_connect( #state{gk_connection = GK_connection} = State, Meta,"mns.load.qa.wifimotion.ca", 443),
     set_options(State, Meta, GKHeaders),
     %Payload = <<"potato">>,
