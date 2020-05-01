@@ -236,6 +236,7 @@ gk_post(#state{gk_connection = GK_connection, prefix = Prefix, http_options = Op
     Response = ?TIMED(Prefix ++ ".http_latency", hackney:send_request(GK_connection,
         {post, Endpoint, Options, Payload})),
     {ok, ResponsePayload} =  hackney:body(GK_connection),
+    lager:info("Payload Returned: ~s", ResponsePayload),
     RetryCheck = re:run(ResponsePayload, "TRYAGAIN"),
     if
         RetryCheck == nomatch ->
@@ -299,7 +300,8 @@ record_response(Prefix, Response) ->
             GK_connection;
         {ok, _, _, GK_connection} ->
             %{ok, Body} = hackney:body(GK_connection),
-            %lager:error("hackney:response fail: ~p", [Body]),
+            lager:error("hackney:response fail: ~p", [Body]),
+            lager:error("hackney: failed: ~p", [E]),
             mzb_metrics:notify({Prefix ++ ".http_fail", counter}, 1),
             GK_connection;
         E ->
