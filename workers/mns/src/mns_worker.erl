@@ -300,8 +300,8 @@ record_response(Prefix, Response) ->
             GK_connection;
         {ok, _, _, GK_connection} ->
             %{ok, Body} = hackney:body(GK_connection),
-            lager:error("hackney:response fail: ~p", [Body]),
-            lager:error("hackney: failed: ~p", [E]),
+            %lager:error("hackney:response fail: ~p", [Body]),
+            %lager:error("hackney: failed: ~p", [E]),
             mzb_metrics:notify({Prefix ++ ".http_fail", counter}, 1),
             GK_connection;
         E ->
